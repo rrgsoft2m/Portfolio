@@ -40,7 +40,7 @@ export default function Services() {
 
                 {/* Services Grid */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {(t.services.items as any).map((service, i: number) => {
+                    {(t.services.items as any).map((service: any, i: number) => {
                         const Icon = icons[i % icons.length];
                         return (
                             <motion.div
