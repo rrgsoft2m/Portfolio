@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const isProd = process.env.NODE_ENV === 'production';
+const defaultApiUrl = isProd ? 'https://rrgsoft-backend.onrender.com' : 'http://localhost:5000';
+let API_URL = process.env.NEXT_PUBLIC_API_URL || defaultApiUrl;
+if (API_URL.endsWith('/api')) {
+    API_URL = API_URL.replace(/\/api$/, '');
+}
 
 const api = axios.create({
     baseURL: API_URL,
