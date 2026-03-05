@@ -19,6 +19,7 @@ export default function AdminMessages() {
     const [loading, setLoading] = useState(true);
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
     const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [deleting, setDeleting] = useState(false);
 
     const fetchMessages = async () => {
         try {
@@ -53,7 +54,8 @@ export default function AdminMessages() {
     };
 
     const confirmDelete = async () => {
-        if (!deleteId) return;
+        if (!deleteId || deleting) return;
+        setDeleting(true);
         try {
             await messagesAPI.delete(deleteId);
             if (selectedMessage?.id === deleteId) setSelectedMessage(null);
@@ -62,6 +64,7 @@ export default function AdminMessages() {
             console.error(err);
         } finally {
             setDeleteId(null);
+            setDeleting(false);
         }
     };
 
@@ -189,9 +192,14 @@ export default function AdminMessages() {
                             </button>
                             <button
                                 onClick={confirmDelete}
-                                className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors"
+                                disabled={deleting}
+                                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors disabled:opacity-50"
                             >
-                                O'chirish
+                                {deleting ? (
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                ) : (
+                                    "O'chirish"
+                                )}
                             </button>
                         </div>
                     </motion.div>
