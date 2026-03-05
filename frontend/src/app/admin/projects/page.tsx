@@ -207,177 +207,181 @@ export default function AdminProjects() {
             {/* Modal */}
             <AnimatePresence>
                 {modalOpen && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setModalOpen(false)}
-                            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-                        />
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed inset-x-4 top-[5%] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-50 w-auto md:w-full md:max-w-lg glass-card rounded-2xl p-6 max-h-[90vh] overflow-y-auto"
-                        >
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-bold">
-                                    {editingProject ? 'Loyihani tahrirlash' : 'Yangi loyiha'}
-                                </h2>
-                                <button onClick={() => setModalOpen(false)} className="p-1 rounded-lg hover:bg-accent">
-                                    <X className="w-5 h-5" />
-                                </button>
+                    <motion.div
+                        key="modal-backdrop"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setModalOpen(false)}
+                        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+                    />
+                )}
+                {modalOpen && (
+                    <motion.div
+                        key="modal-content"
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        className="fixed inset-x-4 top-[5%] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-50 w-auto md:w-full md:max-w-lg glass-card rounded-2xl p-6 max-h-[90vh] overflow-y-auto"
+                    >
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold">
+                                {editingProject ? 'Loyihani tahrirlash' : 'Yangi loyiha'}
+                            </h2>
+                            <button onClick={() => setModalOpen(false)} className="p-1 rounded-lg hover:bg-accent">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1.5">Nomi</label>
+                                <input
+                                    value={form.title}
+                                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                                    className="w-full px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm"
+                                    placeholder="Loyiha nomi"
+                                />
                             </div>
 
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1.5">Nomi</label>
-                                    <input
-                                        value={form.title}
-                                        onChange={(e) => setForm({ ...form, title: e.target.value })}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm"
-                                        placeholder="Loyiha nomi"
-                                    />
-                                </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1.5">Tavsif</label>
+                                <textarea
+                                    value={form.description}
+                                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                                    rows={3}
+                                    className="w-full px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm resize-none"
+                                    placeholder="Loyiha tavsifi"
+                                />
+                            </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium mb-1.5">Tavsif</label>
-                                    <textarea
-                                        value={form.description}
-                                        onChange={(e) => setForm({ ...form, description: e.target.value })}
-                                        rows={3}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm resize-none"
-                                        placeholder="Loyiha tavsifi"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1.5">Rasm</label>
-                                    <div className="flex items-center gap-3">
-                                        <input
-                                            value={form.image}
-                                            onChange={(e) => setForm({ ...form, image: e.target.value })}
-                                            className="flex-1 px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm"
-                                            placeholder="Rasm URL"
-                                        />
-                                        <label className="p-2.5 rounded-xl bg-accent hover:bg-accent/80 cursor-pointer transition-colors">
-                                            <Upload className="w-5 h-5" />
-                                            <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                                        </label>
-                                    </div>
-                                    {uploading && <p className="text-xs text-muted-foreground mt-1">Yuklanmoqda...</p>}
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1.5">Havola</label>
-                                    <input
-                                        value={form.link}
-                                        onChange={(e) => setForm({ ...form, link: e.target.value })}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm"
-                                        placeholder="https://example.com"
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1.5">Kategoriya</label>
-                                        <select
-                                            value={form.category}
-                                            onChange={(e) => setForm({ ...form, category: e.target.value })}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm"
-                                        >
-                                            <option value="Website">Website</option>
-                                            <option value="Web App">Web App</option>
-                                            <option value="Mobile App">Mobile App</option>
-                                            <option value="Education">Education</option>
-                                            <option value="Bot">Bot</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1.5">Tartib</label>
-                                        <input
-                                            type="number"
-                                            value={form.order}
-                                            onChange={(e) => setForm({ ...form, order: parseInt(e.target.value) || 0 })}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm"
-                                        />
-                                    </div>
-                                </div>
-
+                            <div>
+                                <label className="block text-sm font-medium mb-1.5">Rasm</label>
                                 <div className="flex items-center gap-3">
                                     <input
-                                        type="checkbox"
-                                        id="featured"
-                                        checked={form.featured}
-                                        onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                                        className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                                        value={form.image}
+                                        onChange={(e) => setForm({ ...form, image: e.target.value })}
+                                        className="flex-1 px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm"
+                                        placeholder="Rasm URL"
                                     />
-                                    <label htmlFor="featured" className="text-sm font-medium">Featured loyiha</label>
+                                    <label className="p-2.5 rounded-xl bg-accent hover:bg-accent/80 cursor-pointer transition-colors">
+                                        <Upload className="w-5 h-5" />
+                                        <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                                    </label>
                                 </div>
+                                {uploading && <p className="text-xs text-muted-foreground mt-1">Yuklanmoqda...</p>}
+                            </div>
 
-                                <div className="flex gap-3 pt-2">
-                                    <button
-                                        onClick={() => setModalOpen(false)}
-                                        className="flex-1 py-2.5 rounded-xl border border-border text-sm font-medium hover:bg-accent transition-colors"
+                            <div>
+                                <label className="block text-sm font-medium mb-1.5">Havola</label>
+                                <input
+                                    value={form.link}
+                                    onChange={(e) => setForm({ ...form, link: e.target.value })}
+                                    className="w-full px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm"
+                                    placeholder="https://example.com"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1.5">Kategoriya</label>
+                                    <select
+                                        value={form.category}
+                                        onChange={(e) => setForm({ ...form, category: e.target.value })}
+                                        className="w-full px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm"
                                     >
-                                        Bekor qilish
-                                    </button>
-                                    <motion.button
-                                        onClick={handleSave}
-                                        disabled={saving || !form.title}
-                                        className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
-                                        whileTap={{ scale: 0.98 }}
-                                    >
-                                        {saving ? (
-                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        ) : (
-                                            <>
-                                                <Save className="w-4 h-4" />
-                                                Saqlash
-                                            </>
-                                        )}
-                                    </motion.button>
+                                        <option value="Website">Website</option>
+                                        <option value="Web App">Web App</option>
+                                        <option value="Mobile App">Mobile App</option>
+                                        <option value="Education">Education</option>
+                                        <option value="Bot">Bot</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1.5">Tartib</label>
+                                    <input
+                                        type="number"
+                                        value={form.order}
+                                        onChange={(e) => setForm({ ...form, order: parseInt(e.target.value) || 0 })}
+                                        className="w-full px-4 py-2.5 rounded-xl bg-secondary/50 border border-border focus:border-primary outline-none transition-all text-sm"
+                                    />
                                 </div>
                             </div>
-                        </motion.div>
-                    </>
-                )}
 
-                {deleteId && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setDeleteId(null)}
-                            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-                        />
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed inset-x-4 top-[30%] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-50 w-auto md:w-full md:max-w-md glass-card rounded-2xl p-6"
-                        >
-                            <h2 className="text-xl font-bold mb-2">O'chirishni tasdiqlang</h2>
-                            <p className="text-muted-foreground text-sm mb-6">Siz rostdan ham ushbu loyihani o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.</p>
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="checkbox"
+                                    id="featured"
+                                    checked={form.featured}
+                                    onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+                                    className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                                />
+                                <label htmlFor="featured" className="text-sm font-medium">Featured loyiha</label>
+                            </div>
 
-                            <div className="flex gap-3">
+                            <div className="flex gap-3 pt-2">
                                 <button
-                                    onClick={() => setDeleteId(null)}
+                                    onClick={() => setModalOpen(false)}
                                     className="flex-1 py-2.5 rounded-xl border border-border text-sm font-medium hover:bg-accent transition-colors"
                                 >
                                     Bekor qilish
                                 </button>
-                                <button
-                                    onClick={confirmDelete}
-                                    className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors"
+                                <motion.button
+                                    onClick={handleSave}
+                                    disabled={saving || !form.title}
+                                    className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
+                                    whileTap={{ scale: 0.98 }}
                                 >
-                                    O'chirish
-                                </button>
+                                    {saving ? (
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : (
+                                        <>
+                                            <Save className="w-4 h-4" />
+                                            Saqlash
+                                        </>
+                                    )}
+                                </motion.button>
                             </div>
-                        </motion.div>
-                    </>
+                        </div>
+                    </motion.div>
+                )}
+
+                {deleteId && (
+                    <motion.div
+                        key="delete-backdrop"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setDeleteId(null)}
+                        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+                    />
+                )}
+                {deleteId && (
+                    <motion.div
+                        key="delete-content"
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        className="fixed inset-x-4 top-[30%] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-50 w-auto md:w-full md:max-w-md glass-card rounded-2xl p-6"
+                    >
+                        <h2 className="text-xl font-bold mb-2">O'chirishni tasdiqlang</h2>
+                        <p className="text-muted-foreground text-sm mb-6">Siz rostdan ham ushbu loyihani o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.</p>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setDeleteId(null)}
+                                className="flex-1 py-2.5 rounded-xl border border-border text-sm font-medium hover:bg-accent transition-colors"
+                            >
+                                Bekor qilish
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors"
+                            >
+                                O'chirish
+                            </button>
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </div>

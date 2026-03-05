@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Trash2, Eye, Clock } from 'lucide-react';
 import { messagesAPI } from '@/lib/api';
 
@@ -18,6 +18,7 @@ export default function AdminMessages() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
 
     const fetchMessages = async () => {
         try {
@@ -46,14 +47,21 @@ export default function AdminMessages() {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm("Rostdan o'chirmoqchimisiz?")) return;
+    const handleDeleteClick = (id: string, e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
+        setDeleteId(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteId) return;
         try {
-            await messagesAPI.delete(id);
-            if (selectedMessage?.id === id) setSelectedMessage(null);
+            await messagesAPI.delete(deleteId);
+            if (selectedMessage?.id === deleteId) setSelectedMessage(null);
             fetchMessages();
         } catch (err) {
             console.error(err);
+        } finally {
+            setDeleteId(null);
         }
     };
 
@@ -131,7 +139,7 @@ export default function AdminMessages() {
                                     </div>
                                 </div>
                                 <button
-                                    onClick={() => handleDelete(selectedMessage.id)}
+                                    onClick={(e) => handleDeleteClick(selectedMessage.id, e)}
                                     className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
                                 >
                                     <Trash2 className="w-4 h-4" />
@@ -149,6 +157,46 @@ export default function AdminMessages() {
                     )}
                 </div>
             </div>
+
+            <AnimatePresence>
+                {deleteId && (
+                    <motion.div
+                        key="delete-backdrop"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setDeleteId(null)}
+                        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+                    />
+                )}
+                {deleteId && (
+                    <motion.div
+                        key="delete-content"
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        className="fixed inset-x-4 top-[30%] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-50 w-auto md:w-full md:max-w-md glass-card rounded-2xl p-6"
+                    >
+                        <h2 className="text-xl font-bold mb-2">O'chirishni tasdiqlang</h2>
+                        <p className="text-muted-foreground text-sm mb-6">Siz rostdan ham ushbu xabarni o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.</p>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setDeleteId(null)}
+                                className="flex-1 py-2.5 rounded-xl border border-border text-sm font-medium hover:bg-accent transition-colors"
+                            >
+                                Bekor qilish
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors"
+                            >
+                                O'chirish
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
